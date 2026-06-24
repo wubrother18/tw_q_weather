@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tw_q_weather/features/weather/presentation/widgets/initial_view.dart';
 
+import '../../../../core/core/constants/location_names.dart';
+import '../providers/weather_provider.dart';
+import '../widgets/initial_view.dart';
 
 class WeatherPage extends ConsumerStatefulWidget {
   const WeatherPage({super.key});
@@ -21,10 +23,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
 
   void _onSearch() {
     FocusScope.of(context).unfocus();
+    ref.read(weatherProvider.notifier).searchWeather(_controller.text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(weatherProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,15 +41,50 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: '輸入城市名稱，例如：臺北市',
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) => _onSearch(),
-                    onTapOutside: (_) => FocusScope.of(context).requestFocus(FocusNode()),
+                  child: Autocomplete<String>(
+                    optionsBuilder: (textEditingValue) {
+                      if (textEditingValue.text.isEmpty) {
+                        return allLocationNames;
+                      }
+                      final keyword =
+                      textEditingValue.text.trim().replaceAll('台', '臺');
+                      return allLocationNames.where((name) =>
+                      name.contains(keyword) ||
+                          name.contains(textEditingValue.text.trim()));
+                    },
+                    fieldViewBuilder: (context, fieldController, focusNode,
+                        onFieldSubmitted) {
+                      return TextField(
+                        controller: fieldController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          hintText: '輸入城市名稱',
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          suffixIcon: fieldController.text.isNotEmpty
+                              ? IconButton(
+                            icon: const Icon(Icons.clear, size: 18),
+                            onPressed: () {
+                              fieldController.clear();
+                              focusNode.requestFocus();
+                            },
+                          )
+                              : null,
+                        ),
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) => _onSearch(),
+                        onTapOutside: (_) => FocusScope.of(context).requestFocus(FocusNode()),
+                        onTap: () => focusNode.requestFocus(),
+                      );
+                    },
+                    onSelected: (city) {
+                      _onSearch();
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
