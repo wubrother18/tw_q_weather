@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tw_q_weather/features/weather/domain/weather_state.dart';
+import 'package:tw_q_weather/features/weather/presentation/widgets/error_view.dart';
+import 'package:tw_q_weather/features/weather/presentation/widgets/info_view.dart';
+import 'package:tw_q_weather/features/weather/presentation/widgets/loading_view.dart';
 
 import '../../../../core/core/constants/location_names.dart';
 import '../providers/weather_provider.dart';
@@ -14,6 +18,7 @@ class WeatherPage extends ConsumerStatefulWidget {
 
 class _WeatherPageState extends ConsumerState<WeatherPage> {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
 
   @override
   void dispose() {
@@ -23,7 +28,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
 
   void _onSearch() {
     FocusScope.of(context).unfocus();
-    ref.read(weatherProvider.notifier).searchWeather(_controller.text);
+    ref.read(weatherProvider.notifier).getWeather(_controller.text);
   }
 
   @override
@@ -42,6 +47,8 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
               children: [
                 Expanded(
                   child: Autocomplete<String>(
+                    focusNode: _focusNode,
+                    textEditingController: _controller,
                     optionsBuilder: (textEditingValue) {
                       if (textEditingValue.text.isEmpty) {
                         return allLocationNames;
@@ -98,7 +105,12 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: InitialView(),
+              child: switch(state){
+                WeatherInitial() => InitialView(),
+                WeatherLoading() => LoadingView(),
+                WeatherLoaded() => InfoView(),
+                WeatherError() => ErrorView(message: state.message,onRetry: _onSearch,),
+              },
             ),
           ),
         ],
