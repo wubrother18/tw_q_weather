@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tw_q_weather/core/core/theme/app_theme.dart';
+import 'package:tw_q_weather/core/theme/app_theme.dart';
 import 'package:tw_q_weather/features/weather/presentation/pages/weather_page.dart';
 
 void main() {

@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tw_q_weather/core/core/constants/api_constants.dart';
-import 'package:tw_q_weather/core/core/network/dio_client.dart';
+import 'package:tw_q_weather/core/constants/api_constants.dart';
+import 'package:tw_q_weather/core/network/dio_client.dart';
 import 'package:tw_q_weather/features/weather/data/models/weather_model.dart';
 
 final weatherRepositoryProvider = Provider<WeatherRepository>((ref){

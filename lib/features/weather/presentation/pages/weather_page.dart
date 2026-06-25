@@ -5,7 +5,7 @@ import 'package:tw_q_weather/features/weather/presentation/widgets/error_view.da
 import 'package:tw_q_weather/features/weather/presentation/widgets/info_view.dart';
 import 'package:tw_q_weather/features/weather/presentation/widgets/loading_view.dart';
 
-import '../../../../core/core/constants/location_names.dart';
+import '../../../../core/constants/location_names.dart';
 import '../providers/weather_provider.dart';
 import '../widgets/initial_view.dart';
 
@@ -23,6 +23,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
